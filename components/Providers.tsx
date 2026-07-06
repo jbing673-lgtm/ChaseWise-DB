@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import { createBrowserClient } from '@/lib/supabase/client';
 
@@ -16,11 +16,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createBrowserClient();
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   useEffect(() => {
+    let mounted = true;
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -30,8 +32,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
     });
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return <AuthContext.Provider value={{ user, session, loading }}>{children}</AuthContext.Provider>;
 }

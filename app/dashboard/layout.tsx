@@ -1,33 +1,22 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { useAuth } from '@/components/Providers';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = createBrowserClient();
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session) {
-        router.replace('/login?next=' + encodeURIComponent(pathname));
-        return;
-      }
-
-      setLoading(false);
-    };
-
-    checkAuth();
-  }, [router, pathname]);
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [loading, user, router]);
 
   if (loading) {
     return (
