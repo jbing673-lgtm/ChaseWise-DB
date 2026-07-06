@@ -11,7 +11,7 @@ export function Footer() {
             <Link href="/privacy" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Terms of Service</Link>
           </div>
-          <div className="text-sm text-gray-500">Contact: <a href="mailto:support@yourdomain" className="hover:text-gray-900 transition-colors">support@yourdomain</a></div>
+          <div className="text-sm text-gray-500">Contact: <a href="mailto:jbing673@gmail.com" className="hover:text-gray-900 transition-colors">jbing673@gmail.com</a></div>
         </div>
         <div className="mt-6 text-center text-xs text-gray-400">© {new Date().getFullYear()} ChaseWise. All rights reserved.</div>
       </div>
