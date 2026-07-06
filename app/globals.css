@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #2563eb;
+    --color-primary-light: #3b82f6;
+    --color-primary-dark: #1d4ed8;
+    --color-warning: #eab308;
+    --color-warning-light: #facc15;
+    --color-danger: #ef4444;
+    --color-danger-light: #f87171;
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-border: #e2e8f0;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 text-white px-6 py-2.5 rounded-lg font-medium
+           hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500
+           focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary-600 border border-primary-300 px-6 py-2.5 rounded-lg
+           font-medium hover:bg-primary-50 focus:outline-none focus:ring-2
+           focus:ring-primary-500 focus:ring-offset-2 transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply bg-danger-600 text-white px-6 py-2.5 rounded-lg font-medium
+           hover:bg-danger-700 focus:outline-none focus:ring-2 focus:ring-danger-500
+           focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+           placeholder:text-gray-400 transition-colors;
+  }
+
+  .card {
+    @apply bg-white rounded-xl border border-gray-200 shadow-sm p-6;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-r1 {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+
+  .badge-r2 {
+    @apply badge bg-warning-100 text-warning-700;
+  }
+
+  .badge-r3 {
+    @apply badge bg-danger-100 text-danger-700;
+  }
+}
