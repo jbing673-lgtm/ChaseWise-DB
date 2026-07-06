@@ -6,16 +6,6 @@ export const config = {
 };
 
 export default async function middleware(request: NextRequest) {
-  const { response, session } = await updateSession(request);
-
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    if (!session) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/login';
-      url.searchParams.set('next', request.nextUrl.pathname);
-      return Response.redirect(url);
-    }
-  }
-
+  const { response } = await updateSession(request);
   return response;
 }

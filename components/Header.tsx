@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from './Providers';
 import { cn } from '@/lib/utils';
@@ -9,7 +10,7 @@ import { cn } from '@/lib/utils';
 export function Header() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-  const supabase = createBrowserClient();
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
