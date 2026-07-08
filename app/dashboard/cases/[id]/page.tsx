@@ -1,152 +1,127 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { RoundTimeline } from '@/components/RoundTimeline';
 import { NewRoundForm } from '@/components/NewRoundForm';
-import { formatUSD } from '@/lib/utils';
-import { calcCurrentOverdueDays } from '@/lib/utils';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { formatUSD, calcCurrentOverdueDays } from '@/lib/utils';
 import type { Case, Round } from '@/lib/types';
 
 interface CaseDetailResponse {
   case: Case;
   rounds: Round[];
-  profile: {
-    is_pro: boolean;
-  };
+  profile: { is_pro: boolean };
 }
 
 export default function CaseDetailPage() {
   const params = useParams();
-  const caseId = params.id as string;
+  const caseId = params?.id as string;
   const [data, setData] = useState<CaseDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const supabase = useMemo(() => createBrowserClient(), []);
+  const mountedRef = useRef(true);
+  const controllerRef = useRef<AbortController | null>(null);
 
-  async function fetchCase() {
+  const fetchCase = useCallback(async () => {
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/cases/${caseId}`);
-      if (!res.ok) {
-        throw new Error('Failed to load case details');
-      }
-      const data = await res.json();
-      setData(data);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!mountedRef.current) return;
+      const res = await fetch(`/api/cases/${caseId}`, {
+        headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
+        signal: controller.signal,
+      });
+      if (!mountedRef.current) return;
+      if (!res.ok) throw new Error('Failed to load case details');
+      const json = await res.json();
+      if (!mountedRef.current) return;
+      setData(json ?? null);
       setError(null);
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: unknown) {
+      if (err instanceof DOMException && (err as DOMException).name === 'AbortError') return;
+      if (mountedRef.current) {
+        setError((err as Error)?.message ?? 'Unknown error');
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
-  }
+  }, [caseId, supabase]);
 
   useEffect(() => {
+    mountedRef.current = true;
     fetchCase();
-  }, [caseId]);
-
-  const handleRoundCreated = () => {
-    fetchCase();
-  };
+    return () => {
+      mountedRef.current = false;
+      controllerRef.current?.abort();
+    };
+  }, [fetchCase]);
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-center min-h-[40vh]">
-          <div className="animate-spin h-8 w-8 border-2 border-primary-600 border-t-transparent rounded-full" />
-        </div>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          {error}
-        </div>
-        <div className="mt-6">
-          <Link href="/dashboard" className="btn-primary">
-            ← Back to Dashboard
-          </Link>
+      <div className="max-w-2xl mx-auto px-6 py-12 text-center">
+        <div className="card">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            {error ?? 'Case data is still loading or failed to load.'}
+          </div>
+          <Link href="/dashboard" className="btn-secondary">Back to Dashboard</Link>
         </div>
       </div>
     );
   }
 
-  const { case: caseItem, rounds, profile } = data;
-  const currentOverdue = calcCurrentOverdueDays(
-    caseItem.initial_overdue_days,
-    caseItem.created_at
-  );
-
-  const canAddRound = profile.is_pro || rounds.length < 3;
+  const caseItem = data?.case;
+  const rounds = data?.rounds ?? [];
+  const profile = data?.profile ?? { is_pro: false };
+  const currentOverdue = calcCurrentOverdueDays(caseItem?.overdue_days ?? 0, caseItem?.created_at ?? '');
+  const canAddRound = (profile?.is_pro ?? false) || (rounds?.length ?? 0) < 3;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <Link
-            href="/dashboard"
-            className="text-sm text-gray-500 hover:text-primary-600 mb-2 inline-block"
-          >
-            ← Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {caseItem.customer_name}
-          </h1>
+          <Link href="/dashboard" className="text-sm text-primary-600 hover:underline mb-2 inline-block">← Back to Dashboard</Link>
+          <h1 className="text-3xl font-bold text-gray-900">{caseItem?.opponent_name ?? 'Loading...'}</h1>
           <div className="flex flex-wrap gap-3 mt-3">
-            <span className="text-xl font-bold text-gray-900">
-              {formatUSD(caseItem.amount_owed)}
-            </span>
-            <span className="text-sm text-gray-500 border border-gray-200 px-2 py-1 rounded-md">
-              {currentOverdue} {currentOverdue === 1 ? 'day' : 'days'} overdue
-            </span>
-            <span className="text-sm text-gray-500 border border-gray-200 px-2 py-1 rounded-md">
-              {rounds.length} {rounds.length === 1 ? 'round' : 'rounds'} sent
-            </span>
-            {profile.is_pro && (
-              <span className="badge bg-green-100 text-green-700">Pro</span>
-            )}
+            <span className="text-xl font-bold text-gray-900">{formatUSD(caseItem?.amount ?? 0)}</span>
+            <span className="text-sm text-gray-500 border border-gray-200 px-2 py-1 rounded-md">{currentOverdue ?? 0} {currentOverdue === 1 ? 'day' : 'days'} overdue</span>
+            <span className="text-sm text-gray-500 border border-gray-200 px-2 py-1 rounded-md">{rounds?.length ?? 0} {(rounds?.length ?? 0) === 1 ? 'round' : 'rounds'} sent</span>
+            {profile?.is_pro && <span className="badge bg-green-100 text-green-700">Pro</span>}
           </div>
         </div>
       </div>
 
-      {rounds.length > 0 && (
-        <div className="mb-10">
-          <RoundTimeline rounds={rounds} />
-        </div>
+      {(rounds?.length ?? 0) > 0 && (
+        <div className="mb-10"><RoundTimeline rounds={rounds} /></div>
       )}
 
       <div className="card">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          {rounds.length === 0
-            ? 'Round 1 — Generate First Email'
-            : `Round ${rounds.length + 1} — Add Next Response`}
+          {(rounds?.length ?? 0) === 0 ? 'Round 1 — Generate First Email' : `Round ${(rounds?.length ?? 0) + 1} — Add Next Response`}
         </h2>
-
-        {!canAddRound && (
-          <div className="mb-6 p-4 bg-warning-50 border border-warning-200 rounded-lg">
-            <p className="text-warning-800 font-medium">
-              Free plan limit reached.
-            </p>
-            <p className="text-warning-700 mt-1 text-sm">
-              You can only add up to 3 rounds per case on the Free plan. Upgrade to Pro to continue with this case.
-            </p>
-            <div className="mt-3">
-              <Link href="/pricing" className="btn-primary">
-                Upgrade to Pro
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {canAddRound && (
-          <NewRoundForm
-            caseId={caseId}
-            nextRoundNumber={rounds.length + 1}
-            onRoundCreated={handleRoundCreated}
-          />
+        {canAddRound ? (
+          <NewRoundForm caseId={caseId ?? ''} nextRoundNumber={(rounds?.length ?? 0) + 1} onRoundCreated={fetchCase} />
+        ) : (
+          <p className="text-gray-500">
+            Free plan limit reached (3 rounds). <a href="/pricing" className="text-primary-600 hover:underline">Upgrade to Pro</a> for unlimited rounds.
+          </p>
         )}
       </div>
     </div>

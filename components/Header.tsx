@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from './Providers';
@@ -9,12 +9,14 @@ import { cn } from '@/lib/utils';
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, loading } = useAuth();
   const supabase = useMemo(() => createBrowserClient(), []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/';
+    router.push('/');
+    router.refresh();
   };
 
   return (

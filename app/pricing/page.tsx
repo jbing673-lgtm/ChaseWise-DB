@@ -1,22 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PricingCard } from '@/components/PricingCard';
-import { createBrowserClient } from '@/lib/supabase/client';
 
 export default function PricingPage() {
-  const [isPro, setIsPro] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function checkProfile() {
-      const supabase = createBrowserClient();
-      const { data } = await supabase.auth.getSession();
-      setLoading(false);
-    }
-
-    checkProfile();
-  }, []);
+  const [isPro] = useState(false);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">

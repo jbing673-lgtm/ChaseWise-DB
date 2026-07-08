@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+
 import { useEffect } from 'react';
 
-export default function RootError({
+export default function Error({
   error,
   reset,
 }: {
@@ -11,7 +12,10 @@ export default function RootError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Unhandled error:', error);
+    console.error(error);
+    return () => {
+      // cleanup — nothing to abort, but cleanup function exists
+    };
   }, [error]);
 
   return (

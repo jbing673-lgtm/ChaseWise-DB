@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/components/Providers';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function DashboardLayout({
   children,
@@ -11,14 +11,17 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (!loading && !user) {
+    mountedRef.current = true;
+    if (!loading && !user && mountedRef.current) {
       router.replace('/login');
     }
+    return () => { mountedRef.current = false; };
   }, [loading, user, router]);
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin h-6 w-6 border-2 border-primary-600 border-t-transparent rounded-full" />

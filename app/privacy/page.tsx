@@ -4,7 +4,7 @@ export default function PrivacyPage() {
       <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
         Privacy Policy
       </h1>
-      <p className="text-sm text-gray-500 mb-12">Last updated: July 6, 2024</p>
+      <p className="text-sm text-gray-500 mb-12">Last updated: June 30, 2026</p>
 
       <div className="prose prose-gray max-w-none space-y-8">
         <section>
@@ -145,7 +145,7 @@ export default function PrivacyPage() {
           </ul>
           <p className="text-gray-700 leading-relaxed mt-4">
             To exercise any of these rights, please contact us at{' '}
-            <strong>support@yourdomain</strong>.
+            <strong>jbing673@gmail.com</strong>.
           </p>
         </section>
 
@@ -201,7 +201,7 @@ export default function PrivacyPage() {
             If you have any questions about this Privacy Policy, contact us at:
           </p>
           <p className="text-gray-700 mt-2">
-            <strong>Email:</strong> support@yourdomain
+            <strong>Email:</strong> jbing673@gmail.com
           </p>
         </section>
       </div>

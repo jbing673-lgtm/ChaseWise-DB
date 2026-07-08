@@ -29,6 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     };
     getSession();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
     });

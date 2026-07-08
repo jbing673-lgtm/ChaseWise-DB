@@ -37,13 +37,16 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
+      console.error('[auth/callback] exchangeCodeForSession error:', error.message);
       return NextResponse.redirect(
-        new URL('/login?error=auth_callback_failed', request.url)
+        new URL(`/login?error=auth_callback_failed&reason=${encodeURIComponent(error.message)}`, request.url)
       );
     }
 
+    console.log('[auth/callback] Success, redirecting to:', next);
     return response;
   }
 
+  console.error('[auth/callback] Missing code parameter');
   return NextResponse.redirect(new URL('/login?error=missing_code', request.url));
 }

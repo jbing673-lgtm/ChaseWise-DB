@@ -4,7 +4,7 @@ export default function TermsPage() {
       <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
         Terms of Service
       </h1>
-      <p className="text-sm text-gray-500 mb-12">Last updated: July 6, 2024</p>
+      <p className="text-sm text-gray-500 mb-12">Last updated: June 30, 2026</p>
 
       <div className="prose prose-gray max-w-none space-y-8">
         <section>
@@ -185,7 +185,7 @@ export default function TermsPage() {
           <p className="text-gray-700 leading-relaxed mt-4">
             Upon termination, your right to use the Service ceases immediately. If you
             wish to terminate your account, you may either delete your account directly
-            or contact us at support@yourdomain.
+            or contact us at jbing673@gmail.com.
           </p>
         </section>
 
@@ -227,7 +227,7 @@ export default function TermsPage() {
             If you have any questions about these Terms, contact us at:
           </p>
           <p className="text-gray-700 mt-2">
-            <strong>Email:</strong> support@yourdomain
+            <strong>Email:</strong> jbing673@gmail.com
           </p>
         </section>
       </div>
