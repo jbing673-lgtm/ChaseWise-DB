@@ -47,7 +47,12 @@ export function AuthForm({ mode }: AuthFormProps) {
           {error}
         </div>
       )}
-      {mode === 'login' && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('check_email') && (
+      {mode === 'login' && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('reset_success') && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-sm text-green-700">
+          Your password has been reset successfully. Please sign in with your new password.
+        </div>
+      )}
+      {mode === 'login' && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('check_email') && !new URLSearchParams(window.location.search).get('reset_success') && (
         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-sm text-green-700">
           Check your email for a confirmation link.
         </div>
