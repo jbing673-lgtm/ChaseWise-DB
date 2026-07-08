@@ -81,6 +81,13 @@ export function AuthForm({ mode }: AuthFormProps) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
           />
+          {mode === 'login' && (
+            <div className="mt-1 text-right">
+              <a href="/forgot-password" className="text-xs text-primary-600 hover:underline">
+                Forgot Password?
+              </a>
+            </div>
+          )}
         </div>
         <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading
