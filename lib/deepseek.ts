@@ -1,6 +1,6 @@
 /**
  * DeepSeek API server-side wrapper.
- * Generates English collection emails and rebuttals using the deepseek-chat model.
+ * Generates English collection emails and rebuttals using the deepseek-v4-flash model.
  * Tier calculation is handled by lib/tier.ts — this module only generates text.
  *
  * NEVER import this file in Client Components.
@@ -93,7 +93,7 @@ export async function generateEmail(params: GenerateEmailParams): Promise<Genera
   const userPrompt = buildUserPrompt(params);
 
   const completion = await client.chat.completions.create({
-    model: 'deepseek-chat',
+    model: 'deepseek-v4-flash',
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
